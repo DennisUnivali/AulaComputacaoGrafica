@@ -17,21 +17,15 @@ import static org.lwjgl.system.MemoryUtil.*;
 public class HelloWorld {
 
 	// The window handle
-	private long window;
+	private static long window;
 
-	public void run() {
-		System.out.println("Hello LWJGL " + Version.getVersion() + "!");
-
-		loop();
-
-		// Free the window callbacks and destroy the window
-		glfwFreeCallbacks(window);
-		glfwDestroyWindow(window);
-
-		// Terminate GLFW and free the error callback
-		glfwTerminate();
-		glfwSetErrorCallback(null).free();
-	}
+//	public void run() {
+//		System.out.println("Hello LWJGL " + Version.getVersion() + "!");
+//
+//		loop();
+//
+//
+//	}
 
 	private void init() {
 		// Setup an error callback. The default implementation
@@ -163,7 +157,15 @@ public class HelloWorld {
 	public static void main(String[] args) {
 		HelloWorld hw = new HelloWorld();
 		hw.init();
-		hw.run();
+		hw.loop();
+		
+		// Free the window callbacks and destroy the window
+		glfwFreeCallbacks(window);
+		glfwDestroyWindow(window);
+
+		// Terminate GLFW and free the error callback
+		glfwTerminate();
+		glfwSetErrorCallback(null).free();
 	}
 	
 	public static void gluPerspective(float fovy, float aspect, float near, float far) {
