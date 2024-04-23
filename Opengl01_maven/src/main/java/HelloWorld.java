@@ -22,7 +22,6 @@ public class HelloWorld {
 	public void run() {
 		System.out.println("Hello LWJGL " + Version.getVersion() + "!");
 
-		init();
 		loop();
 
 		// Free the window callbacks and destroy the window
@@ -162,7 +161,9 @@ public class HelloWorld {
 	}
 
 	public static void main(String[] args) {
-		new HelloWorld().run();
+		HelloWorld hw = new HelloWorld();
+		hw.init();
+		hw.run();
 	}
 	
 	public static void gluPerspective(float fovy, float aspect, float near, float far) {
