@@ -38,12 +38,9 @@ public class Main3D {
 	// The window handle
 	private long window;
 	
-	float angTankViewX = 0;
-	float angTankViewY = 0;
-	
-	float angTowerViewY = 0;
-	
-	float angCanonViewZ = 0;
+	float viewAngX = 0;
+	float viewAngY = 0;
+	float scale = 1.0f;
 	
 	public Random rnd = new Random();
 	
@@ -82,7 +79,7 @@ public class Main3D {
 		glfwWindowHint(GLFW_RESIZABLE, GLFW_TRUE); // the window will be resizable
 
 		// Create the window
-		window = glfwCreateWindow(800, 600, "Hello World!", NULL, NULL);
+		window = glfwCreateWindow(1500, 1000, "Hello World!", NULL, NULL);
 		if (window == NULL)
 			throw new RuntimeException("Failed to create the GLFW window");
 
@@ -93,30 +90,22 @@ public class Main3D {
 				glfwSetWindowShouldClose(window, true); // We will detect this in the rendering loop
 		
 			if ( key == GLFW_KEY_W) {
-				angTankViewX+=5;
+				viewAngX+=5;
 			}
 			if ( key == GLFW_KEY_S) {
-				angTankViewX-=5;
+				viewAngX-=5;
 			}
 			if ( key == GLFW_KEY_A) {
-				angTankViewY+=5;
+				viewAngY+=5;
 			}
 			if ( key == GLFW_KEY_D) {
-				angTankViewY-=5;
+				viewAngY-=5;
 			}
-			
-			if ( key == GLFW_KEY_N) {
-				angTowerViewY+=5;
+			if ( key == GLFW_KEY_Z) {
+				scale = scale*1.1f;
 			}
-			if ( key == GLFW_KEY_M) {
-				angTowerViewY-=5;
-			}
-			
-			if ( key == GLFW_KEY_G) {
-				angCanonViewZ+=5;
-			}
-			if ( key == GLFW_KEY_B) {
-				angCanonViewZ-=5;
+			if ( key == GLFW_KEY_X) {
+				scale = scale*0.9f;
 			}
 		
 		});
@@ -279,6 +268,10 @@ public class Main3D {
 			
 			Matrix4f view = new Matrix4f();
 			view.setIdentity();
+			
+			view.scale(new Vector3f(scale,scale,scale));
+			view.rotate(viewAngX*0.0174532f, new Vector3f(1,0,0));
+			view.rotate(viewAngY*0.0174532f, new Vector3f(0,1,0));
 			view.translate(new Vector3f(0,0,0));
 			int viewlocation = glGetUniformLocation(shader.programID, "view");
 			
