@@ -63,8 +63,24 @@ public class ObjHTGsrtm extends Model{
 					//System.out.println(""+data[j][i]);
 				}
 			}
+			
+			int dataB[][] = new int[wh/4][wh/4];
+			for(int j = 0 ; j < (wh-4);j+=4) {
+				for(int i = 0 ; i < (wh-4);i+=4) {
+					int soma = 0;
+					for(int jy = 0 ; jy < 4;jy++) {
+						for(int ix = 0 ; ix < 4;ix++) {
+							soma+=data[j+jy][i+ix];
+						}
+					}
+					dataB[j/4][i/4] = (soma/16);
+				}
+			}
+			
+			data = dataB;
+			wh = wh/4;
 			//TIRAR DEPOIS
-			wh = 1000;
+			//wh = 1000;
 			
 			vertices = (wh-1)*(wh-1)*6;
 			FloatBuffer vertex_data = BufferUtils.createFloatBuffer(vertices * vertex_size);
@@ -80,10 +96,13 @@ public class ObjHTGsrtm extends Model{
 					int p3 = data[j+1][i+1];
 					int p4 = data[j+1][i];
 					
-					float v1[] = {i*0.01f, p1*0.001f, j*0.01f}; 
-					float v2[] = {(i+1)*0.01f, p2*0.001f, j*0.01f}; 
-					float v3[] = {(i+1)*0.01f, p3*0.001f, (j+1)*0.01f}; 
-					float v4[] = {i*0.01f, p4*0.001f, (j+1)*0.01f};
+					//float passoxz = 0.01f;
+					float passoxz = 0.04f;
+					
+					float v1[] = {i*passoxz, p1*0.001f, j*passoxz}; 
+					float v2[] = {(i+1)*passoxz, p2*0.001f, j*passoxz}; 
+					float v3[] = {(i+1)*passoxz, p3*0.001f, (j+1)*passoxz}; 
+					float v4[] = {i*passoxz, p4*0.001f, (j+1)*passoxz};
 					
 					vertex_data.put(v1);
 					vertex_data.put(v2);
@@ -259,9 +278,9 @@ public class ObjHTGsrtm extends Model{
 	
 	    /* normalizacao de n */
 	    float len = (float)Math.sqrt(n[0]*n[0] + n[1]*n[1] + n[2]*n[2]);
-	    n[0] /= len;
-	    n[1] /= len;
-	    n[2] /= len;
+	    n[0] /= -len;
+	    n[1] /= -len;
+	    n[2] /= -len;
 	    
 	    return n;
 	}

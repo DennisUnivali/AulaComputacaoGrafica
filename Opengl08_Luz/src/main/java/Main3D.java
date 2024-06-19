@@ -71,9 +71,13 @@ public class Main3D {
 	
 	int tmult;
 	int tgato;
+	int txtmig;
 	FloatBuffer matrixBuffer = MemoryUtil.memAllocFloat(16);
 	Cubo3D mapa;
 	Cubo3D umcubo;
+	Cubo3D m29;
+	
+	double angluz = 0;
 
 	public void run() {
 		System.out.println("Hello LWJGL " + Version.getVersion() + "!");
@@ -213,14 +217,22 @@ public class Main3D {
 		//Cubo3D cubo = new Cubo3D(0.0f, 0.0f, -1.0f, 0.2f);
 		//cubo.vbocube = vboc;
 		
-		ObjModel x35 = new ObjModel();
-		x35.loadObj("x-35_obj.obj");
-		x35.load();
+		//ObjModel x35 = new ObjModel();
+		//x35.loadObj("x-35_obj.obj");
+		//x35.load();
+		
+		System.out.println("------> Carrega MIG");
+		ObjModel mig29 = new ObjModel();
+		mig29.loadObj("Mig_29_obj.obj");
+		mig29.load();
+		
+		m29 = new Cubo3D(0, 0, 0, 0.01f);
+		m29.model = mig29;
 		
 		ObjHTGsrtm model = new ObjHTGsrtm();
 		model.load();
 		
-		mapa = new Cubo3D(0.0f, 0.0f, 0.0f, 1);
+		mapa = new Cubo3D(-10.0f, 0.0f, -10.0f, 10);
 		mapa.model = model;
 		
 		umcubo = new Cubo3D(0.0f, 0.0f, 0.8f, 0.1f);
@@ -248,6 +260,12 @@ public class Main3D {
 		BufferedImage imgmulttexture = TextureLoader.loadImage("multtexture.png");
 		tmult = TextureLoader.loadTexture(imgmulttexture);
 		System.out.println("tmult "+tmult);
+		
+		
+		BufferedImage texturamig = TextureLoader.loadImage("TexturaMig01.png");
+		txtmig = TextureLoader.loadTexture(texturamig);
+		System.out.println("tmult "+tmult);
+		
 
 		int frame = 0;
 		long lasttime = System.currentTimeMillis();
@@ -285,18 +303,9 @@ public class Main3D {
 	private void gameUpdate(long diftime) {
 		float vel = 1.0f;
 		
-		if(FORWARD) {
-			cameraPos.x -= cameraVectorFront.x*vel*diftime/1000.0f;
-			cameraPos.y -= cameraVectorFront.y*vel*diftime/1000.0f;
-			cameraPos.z -= cameraVectorFront.z*vel*diftime/1000.0f;
-			//System.out.println("UP "+diftime);
-		}
-		if(BACKWARD) {
-			cameraPos.x += cameraVectorFront.x*vel*diftime/1000.0f;
-			cameraPos.y += cameraVectorFront.y*vel*diftime/1000.0f;
-			cameraPos.z += cameraVectorFront.z*vel*diftime/1000.0f;
-			//System.out.println("UP "+diftime);
-		}
+		//angluz+=(Math.PI/4)*diftime/1000.0f;
+		angluz = 0;
+		
 //		
 //		if(RIGHT) {
 //			cameraPos.x += cameraVectorRight.x*vel*diftime/1000.0f;
@@ -334,9 +343,36 @@ public class Main3D {
 		vec3dNormilize(cameraVectorRight);
 		vec3dNormilize(cameraVectorUP);
 		
+		if(FORWARD) {
+			cameraPos.x -= cameraVectorFront.x*vel*diftime/1000.0f;
+			cameraPos.y -= cameraVectorFront.y*vel*diftime/1000.0f;
+			cameraPos.z -= cameraVectorFront.z*vel*diftime/1000.0f;
+			//System.out.println("UP "+diftime);
+		}
+		if(BACKWARD) {
+			cameraPos.x += cameraVectorFront.x*vel*diftime/1000.0f;
+			cameraPos.y += cameraVectorFront.y*vel*diftime/1000.0f;
+			cameraPos.z += cameraVectorFront.z*vel*diftime/1000.0f;
+			//System.out.println("UP "+diftime);
+		}		
+		
 		Vector4f t = new Vector4f(cameraPos.dot(cameraPos, cameraVectorRight),cameraPos.dot(cameraPos, cameraVectorUP),cameraPos.dot(cameraPos, cameraVectorFront),1.0f);
 		
 		view = setLookAtMatrix(t, cameraVectorFront, cameraVectorUP, cameraVectorRight);
+		
+		Matrix4f transf = new Matrix4f();
+		transf.setIdentity();
+		transf.translate(new Vector3f(1,1,0));
+		view.mul(view, transf , view);
+		
+//		float migx = cameraPos.x+cameraVectorFront.x*-2;
+//		float migy = cameraPos.y+cameraVectorFront.y*-2;
+//		float migz = cameraPos.z+cameraVectorFront.z*-2;
+//		
+//		m29.x = migx;
+//		m29.y = migy;
+//		m29.z = migz;
+		
 		//view.mul(view, cameraMatrix, view);
 		//view.translate(new Vector3f(-cameraPos.x,-cameraPos.y,-cameraPos.z));
 		
@@ -355,19 +391,6 @@ public class Main3D {
 
 		glLoadIdentity();
 
-//		float[] lightAmbient = { 0.1f, 0.1f, 0.1f, 0.5f };
-//		float[] lightDiffuse = { 0.5f, 0.5f, 0.5f, 0.5f };
-//		float[] lightPosition = { 0.0f, 0.0f, 0.0f, 1.0f };
-//		//float[] lightPosition = { 0.0f, senoang * 600f, cosang * 600f, 1.0f };
-//
-//		glLightfv(GL_LIGHT0, GL_AMBIENT, lightAmbient);
-//		glLightfv(GL_LIGHT0, GL_DIFFUSE, lightDiffuse);
-//		glLightfv(GL_LIGHT0, GL_POSITION, lightPosition);
-//
-//		float[] lightAmbient2 = { 0.0f, 0.0f, 0.0f, 1.0f };
-//		float[] lightDiffuse2 = { 1.0f, 1.0f, 1.0f, 1.0f };
-//		float[] lightPosition2 = { -5f, -5f, 0f, 1.0f };
-
 		shader.start();
 		
 		int projectionlocation = glGetUniformLocation(shader.programID, "projection");
@@ -378,7 +401,11 @@ public class Main3D {
 		glUniformMatrix4fv(projectionlocation, false, matrixBuffer);
 		
 		int lightpos = glGetUniformLocation(shader.programID, "lightPosition");
-		float vf[] = {0.0f,20.0f,0.0f,1.0f};
+		
+		float yl = (float)(Math.cos(angluz)*50.0);
+		float zl = (float)(Math.sin(angluz)*50.0);
+		
+		float vf[] = {0.0f,yl,zl,1.0f};
 		glUniform4fv(lightpos, vf);
 		
 		glEnable(GL_DEPTH_TEST);
@@ -408,6 +435,23 @@ public class Main3D {
 //			for(int i = 0; i < listaObjetos.size();i++) {
 //				listaObjetos.get(i).DesenhaSe(shader);
 //			}
+		
+		
+		
+		
+		viewlocation = glGetUniformLocation(shader.programID, "view");
+		Matrix4f mvn = new Matrix4f();
+		mvn.setIdentity();
+		mvn.storeTranspose(matrixBuffer);
+		matrixBuffer.flip();
+		glUniformMatrix4fv(viewlocation, false, matrixBuffer);
+		
+		m29.z = -2;
+		m29.y = -0.5f;
+		
+		glBindTexture(GL_TEXTURE_2D, txtmig);
+		m29.DesenhaSe(shader);
+		
 		
 		
 		shader.stop();

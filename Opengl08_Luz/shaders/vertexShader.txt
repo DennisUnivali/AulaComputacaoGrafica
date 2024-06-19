@@ -23,12 +23,12 @@ void main(void){
 	mat4 modelview = model*view;
 	//mat4 modelview = view*model;
 	gl_Position = (vec4(position,1.0)*modelview*projection);
-	norm = (vec4(normal,1.0)*modelview).xyz;
 	uv = vec2(textuv.y,1-textuv.x);
 	color = vec3(cor.x,cor.y,cor.z);
 	//color = vec3((normal.x+1)*0.5,(normal.y+1)*0.5,(normal.z+1)*0.5);
 	//color = vec3(textuv.x,0,textuv.y);
 	
-	posOriginal = ((vec4(position,1.0))*modelview).xyz;
-	vligthpos = (lightPosition*modelview).xyz;
+	posOriginal = ((vec4(position,1.0))*model).xyz;
+	norm = normalize(((vec4(position+normal,1.0)*model).xyz)-posOriginal);
+	vligthpos = lightPosition.xyz;
 }

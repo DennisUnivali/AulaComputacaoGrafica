@@ -76,4 +76,10 @@ public class Vector3f {
 		z *= fMult;
 		return;
 	}
+	
+	@Override
+	public String toString() {
+		// TODO Auto-generated method stub
+		return "["+x+","+y+","+z+"]";
+	}
 }

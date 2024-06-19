@@ -50,6 +50,7 @@ public class Cubo3D extends Object3D {
 		modelm.setIdentity();
 		
 		//System.out.println(""+x+" "+y+" "+z);
+		
 		modelm.translate(new Vector3f(x,y,z));
 		modelm.scale(new Vector3f(raio,raio,raio));
 		modelm.rotate(ang,new Vector3f(0.0f,1.0f,0.0f));

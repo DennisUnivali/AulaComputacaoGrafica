@@ -169,6 +169,7 @@ public class ObjModel extends Model {
 
 		}
 		// System.out.println();
+		vec.Normalize();
 		vn.add(vec);
 	}
 
@@ -306,6 +307,8 @@ public class ObjModel extends Model {
 				Vector3f n1 = vn.get(face.n[0]-1);
 				Vector3f n2 = vn.get(face.n[1]-1);
 				Vector3f n3 = vn.get(face.n[2]-1);
+				
+				System.out.println(" "+n1);
 				
 				float na[] = {n1.x,n1.y,n1.z};
 				float nb[] = {n2.x,n2.y,n2.z};
@@ -507,6 +510,11 @@ public class ObjModel extends Model {
 	@Override
 	public void draw() {
 		//desenhaseFaces(f.size());
+		glEnableClientState(GL_VERTEX_ARRAY);
+		glBindBuffer(GL_ARRAY_BUFFER, vbo_vertex_handle);
+		//glVertexPointer(vertex_size, GL_FLOAT, 0, 0l);
+		glEnableVertexAttribArray(0);
+		glVertexAttribPointer(0,vertex_size,GL_FLOAT,false,0,0);
 		
 		glEnableClientState(GL_NORMAL_ARRAY);
 		glBindBuffer(GL_ARRAY_BUFFER, vbo_normal_handle);
@@ -520,14 +528,10 @@ public class ObjModel extends Model {
 		glEnableVertexAttribArray(3);
 		glVertexAttribPointer(3,texture_size,GL_FLOAT,false,0,0);
 		
-		glEnableClientState(GL_VERTEX_ARRAY);
-		glBindBuffer(GL_ARRAY_BUFFER, vbo_vertex_handle);
-		//glVertexPointer(vertex_size, GL_FLOAT, 0, 0l);
-		glEnableVertexAttribArray(0);
-		glVertexAttribPointer(0,vertex_size,GL_FLOAT,false,0,0);
+
 				
 		
-		glEnableClientState(GL_VERTEX_ARRAY);
+		glEnableClientState(GL_NORMAL_ARRAY);
 		glEnableClientState(GL_TEXTURE_COORD_ARRAY);
 		glEnableClientState(GL_VERTEX_ARRAY);
 		
