@@ -13,8 +13,10 @@ import obj.Cubo3D;
 import obj.ObjHTGsrtm;
 import obj.ObjModel;
 import obj.Object3D;
+import obj.Player;
 import shaders.StaticShader;
 import util.TextureLoader;
+import util.Utils3D;
 
 import java.awt.image.BufferedImage;
 
@@ -75,7 +77,7 @@ public class Main3D {
 	FloatBuffer matrixBuffer = MemoryUtil.memAllocFloat(16);
 	Cubo3D mapa;
 	Cubo3D umcubo;
-	Cubo3D m29;
+	Player m29;
 	
 	double angluz = 0;
 
@@ -226,7 +228,7 @@ public class Main3D {
 		mig29.loadObj("Mig_29_obj.obj");
 		mig29.load();
 		
-		m29 = new Cubo3D(0, 0, 0, 0.01f);
+		m29 = new Player(0, 0, 0, 0.01f);
 		m29.model = mig29;
 		
 		ObjHTGsrtm model = new ObjHTGsrtm();
@@ -272,11 +274,11 @@ public class Main3D {
 
 		float angle = 0;
 		
-		glMatrixMode(GL_PROJECTION);
-		glLoadIdentity();
-		gluPerspective(45, 600f / 800f, 0.5f, 100);
-		glMatrixMode(GL_MODELVIEW);
-		glLoadIdentity();
+//		glMatrixMode(GL_PROJECTION);
+//		glLoadIdentity();
+//		gluPerspective(45, 600f / 800f, 0.5f, 100);
+//		glMatrixMode(GL_MODELVIEW);
+//		glLoadIdentity();
 		
 		
 		long ultimoTempo = System.currentTimeMillis();
@@ -301,7 +303,7 @@ public class Main3D {
 	}
 
 	private void gameUpdate(long diftime) {
-		float vel = 1.0f;
+		float vel = 5.0f;
 		
 		//angluz+=(Math.PI/4)*diftime/1000.0f;
 		angluz = 0;
@@ -339,9 +341,9 @@ public class Main3D {
 		rotTmp.transform(rotTmp,cameraVectorRight, cameraVectorRight);
 		rotTmp.transform(rotTmp,cameraVectorUP, cameraVectorUP);
 		
-		vec3dNormilize(cameraVectorFront);
-		vec3dNormilize(cameraVectorRight);
-		vec3dNormilize(cameraVectorUP);
+		Utils3D.vec3dNormilize(cameraVectorFront);
+		Utils3D.vec3dNormilize(cameraVectorRight);
+		Utils3D.vec3dNormilize(cameraVectorUP);
 		
 		if(FORWARD) {
 			cameraPos.x -= cameraVectorFront.x*vel*diftime/1000.0f;
@@ -358,12 +360,12 @@ public class Main3D {
 		
 		Vector4f t = new Vector4f(cameraPos.dot(cameraPos, cameraVectorRight),cameraPos.dot(cameraPos, cameraVectorUP),cameraPos.dot(cameraPos, cameraVectorFront),1.0f);
 		
-		view = setLookAtMatrix(t, cameraVectorFront, cameraVectorUP, cameraVectorRight);
+		view = Utils3D.setLookAtMatrix(t, cameraVectorFront, cameraVectorUP, cameraVectorRight);
 		
 		Matrix4f transf = new Matrix4f();
 		transf.setIdentity();
 		transf.translate(new Vector3f(1,1,0));
-		view.mul(view, transf , view);
+		view.mul(transf,view, view);
 		
 //		float migx = cameraPos.x+cameraVectorFront.x*-2;
 //		float migy = cameraPos.y+cameraVectorFront.y*-2;
@@ -395,7 +397,7 @@ public class Main3D {
 		
 		int projectionlocation = glGetUniformLocation(shader.programID, "projection");
 		//Matrix4f projection = setFrustum(-1f,1f,-1f,1f,1f,100.0f);
-		Matrix4f projection = setFrustum(-0.1f,0.1f,-0.1f,0.1f,0.1f,100.0f);
+		Matrix4f projection = Utils3D.setFrustum(-1.5f,1.5f,-1f,1f,1f,500.0f);
 		projection.storeTranspose(matrixBuffer);
 		matrixBuffer.flip();
 		glUniformMatrix4fv(projectionlocation, false, matrixBuffer);
@@ -439,15 +441,24 @@ public class Main3D {
 		
 		
 		
-		viewlocation = glGetUniformLocation(shader.programID, "view");
-		Matrix4f mvn = new Matrix4f();
-		mvn.setIdentity();
-		mvn.storeTranspose(matrixBuffer);
-		matrixBuffer.flip();
-		glUniformMatrix4fv(viewlocation, false, matrixBuffer);
+//		viewlocation = glGetUniformLocation(shader.programID, "view");
+//		Matrix4f mvn = new Matrix4f();
+//		mvn.setIdentity();
+//		mvn.storeTranspose(matrixBuffer);
+//		matrixBuffer.flip();
+//		glUniformMatrix4fv(viewlocation, false, matrixBuffer);
 		
-		m29.z = -2;
-		m29.y = -0.5f;
+		m29.raio = 0.01f;
+		m29.Front = cameraVectorFront;
+		m29.UP = cameraVectorUP;
+		m29.Right = cameraVectorRight;
+		m29.x = cameraPos.x - cameraVectorFront.x*2;
+		m29.y = cameraPos.y - cameraVectorFront.y*2;
+		m29.z = cameraPos.z - cameraVectorFront.z*2;
+		
+		System.out.println(""+cameraVectorFront);
+		System.out.println(""+m29.x+" "+m29.y+" "+m29.z);
+		//m29.y = -0.5f;
 		
 		glBindTexture(GL_TEXTURE_2D, txtmig);
 		m29.DesenhaSe(shader);
@@ -474,97 +485,6 @@ public class Main3D {
 		float left = aspect * bottom;
 		float right = -left;
 		glFrustum(left, right, bottom, top, near, far);
-	}
-	
-	public static Matrix4f setLookAtMatrix(Vector4f pos,Vector4f front,Vector4f up,Vector4f right) {
-		Matrix4f m = new Matrix4f();
-		m.m00 = right.x;
-		m.m01 = up.x;
-		m.m02 = front.x;
-		m.m03 = 0.0f;
-		
-		m.m10 = right.y;
-		m.m11 = up.y;
-		m.m12 = front.y;
-		m.m13 = 0.0f;
-		
-		m.m20 = right.z;
-		m.m21 = up.z;
-		m.m22 = front.z;
-		m.m23 = 0.0f;
-		
-		m.m30 = -pos.x;
-		m.m31 = -pos.y;
-		m.m32 = -pos.z;
-		m.m33 = 1.0f;		
-		
-		return m;
-	}
-	
-	public static Matrix4f setLookAtMatrixB(Vector4f pos,Vector4f front,Vector4f up,Vector4f right) {
-		Matrix4f m = new Matrix4f();
-		m.m00 = right.x;
-		m.m01 = right.y;
-		m.m02 = right.z;
-		m.m03 = pos.x;
-		
-		m.m10 = up.x;
-		m.m11 = up.y;
-		m.m12 = up.z;
-		m.m13 = pos.y;
-		
-		m.m20 = front.x;
-		m.m21 = front.y;
-		m.m22 = front.z;
-		m.m23 = pos.z;
-		
-		m.m30 = 0.0f;
-		m.m31 = 0.0f;
-		m.m32 = 0.0f;
-		m.m33 = 1.0f;		
-		
-		return m;
-	}	
-	
-	public static double vecMag(Vector4f v) {
-		return Math.sqrt(v.x*v.x+v.y*v.y+v.z*v.z);
-	}
-	
-	public static void vec3dNormilize(Vector4f v) {
-		double mag = vecMag(v);
-		v.setX((float)(v.x/mag));
-		v.setY((float)(v.y/mag));
-		v.setZ((float)(v.z/mag));
-	}
-	
-//////////////////////////////////////////////////////////////////////////////
-//equivalent to glFrustum()
-//PARAMS: (left, right, bottom, top, near, far)
-///////////////////////////////////////////////////////////////////////////////
-	Matrix4f setFrustum(float l, float r, float b, float t, float n, float f)
-	{
-		Matrix4f m = new Matrix4f();
-		m.m00 = 2 * n / (r - l);
-		m.m01 = 0.0f;
-		m.m02 = 0.0f;
-		m.m03 = 0.0f;
-		
-		m.m10 = 0.0f;
-		m.m11 = 2 * n / (t - b);
-		m.m12 = 0.0f;
-		m.m13 = 0.0f;
-		
-		m.m20 = (r + l) / (r - l);
-		m.m21 = (t + b) / (t - b);
-		m.m22 = -(f + n) / (f - n);
-		m.m23 = -1;
-		
-		m.m30 = 0.0f;
-		m.m31 = 0.0f;
-		m.m32 = -(2 * f * n) / (f - n);
-		m.m33 = 0;
-
-		return m;
 	}
 
 }
