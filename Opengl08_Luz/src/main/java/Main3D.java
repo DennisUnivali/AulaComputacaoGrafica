@@ -325,10 +325,10 @@ public class Main3D {
 		Matrix4f rotTmp = new Matrix4f();
 		rotTmp.setIdentity();
 		if(RIGHT) {
-			rotTmp.rotate(1.0f*diftime/1000.0f, new Vector3f(cameraVectorUP.x, cameraVectorUP.y, cameraVectorUP.z));
+			rotTmp.rotate(-1.0f*diftime/1000.0f, new Vector3f(cameraVectorUP.x, cameraVectorUP.y, cameraVectorUP.z));
 		}
 		if(LEFT) {
-			rotTmp.rotate(-1.0f*diftime/1000.0f, new Vector3f(cameraVectorUP.x, cameraVectorUP.y, cameraVectorUP.z));
+			rotTmp.rotate(1.0f*diftime/1000.0f, new Vector3f(cameraVectorUP.x, cameraVectorUP.y, cameraVectorUP.z));
 		}
 		if(UP) {
 			rotTmp.rotate(-1.0f*diftime/1000.0f, new Vector3f(cameraVectorRight.x, cameraVectorRight.y, cameraVectorRight.z));
@@ -336,6 +336,13 @@ public class Main3D {
 		if(DOWN) {
 			rotTmp.rotate(1.0f*diftime/1000.0f, new Vector3f(cameraVectorRight.x, cameraVectorRight.y, cameraVectorRight.z));
 		}
+		if(QBu) {
+			rotTmp.rotate(-1.0f*diftime/1000.0f, new Vector3f(cameraVectorFront.x, cameraVectorFront.y, cameraVectorFront.z));
+		}
+		if(EBu) {
+			rotTmp.rotate(1.0f*diftime/1000.0f, new Vector3f(cameraVectorFront.x, cameraVectorFront.y, cameraVectorFront.z));
+		}
+		
 		
 		rotTmp.transform(rotTmp,cameraVectorFront, cameraVectorFront);
 		rotTmp.transform(rotTmp,cameraVectorRight, cameraVectorRight);
