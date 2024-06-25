@@ -13,6 +13,8 @@ public class Object3D {
 	
 	public float raio = 0; 
 	
+	public boolean vivo = true;
+	
 	public Object3D(float x, float y, float z) {
 		super();
 		this.x = x;

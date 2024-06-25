@@ -225,50 +225,7 @@ public class VboCube extends Model{
 		texture_data.put(uv4);
 		texture_data.put(uv1);
 		
-//		//back
-//		texture_data.put(uv5);
-//		texture_data.put(uv6);
-//		texture_data.put(uv7);
-//		
-//		texture_data.put(uv7);
-//		texture_data.put(uv8);
-//		texture_data.put(uv5);
-//		
-//		//left	
-//		texture_data.put(uv5);
-//		texture_data.put(uv1);
-//		texture_data.put(uv4);
-//		
-//		texture_data.put(uv4);
-//		texture_data.put(uv8);
-//		texture_data.put(uv5);
-//		
-//		//Right
-//		texture_data.put(uv6);
-//		texture_data.put(uv2);
-//		texture_data.put(uv3);
-//		
-//		texture_data.put(uv3);
-//		texture_data.put(uv7);
-//		texture_data.put(uv6);	
-//		
-//		//Top	
-//		texture_data.put(uv1);
-//		texture_data.put(uv2);
-//		texture_data.put(uv6);
-//		
-//		texture_data.put(uv6);
-//		texture_data.put(uv5);
-//		texture_data.put(uv1);
-//		
-//		//Botton
-//		texture_data.put(uv4);
-//		texture_data.put(uv3);
-//		texture_data.put(uv7);
-//		
-//		texture_data.put(uv7);
-//		texture_data.put(uv8);
-//		texture_data.put(uv4);
+
 		
 		texture_data.flip();		
 

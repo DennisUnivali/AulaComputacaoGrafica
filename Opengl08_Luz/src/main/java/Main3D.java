@@ -14,6 +14,7 @@ import obj.ObjHTGsrtm;
 import obj.ObjModel;
 import obj.Object3D;
 import obj.Player;
+import obj.Projetil;
 import shaders.StaticShader;
 import util.TextureLoader;
 import util.Utils3D;
@@ -68,6 +69,8 @@ public class Main3D {
 	
 	boolean QBu = false;
 	boolean EBu = false;
+
+	boolean FIRE = false;
 	
 	Matrix4f cameraMatrix = new Matrix4f();
 	
@@ -148,6 +151,9 @@ public class Main3D {
 				if ( key == GLFW_KEY_DOWN) {
 					BACKWARD = true;
 				}
+				if ( key == GLFW_KEY_SPACE) {
+					FIRE = true;
+				}
 			}
 			if(action == GLFW_RELEASE) {
 				if ( key == GLFW_KEY_W) {
@@ -173,7 +179,10 @@ public class Main3D {
 				}
 				if ( key == GLFW_KEY_DOWN) {
 					BACKWARD = false;
-				}				
+				}
+				if ( key == GLFW_KEY_SPACE) {
+					FIRE = false;
+				}
 			}
 		});
 
@@ -240,17 +249,17 @@ public class Main3D {
 		umcubo = new Cubo3D(0.0f, 0.0f, 0.8f, 0.1f);
 		umcubo.model = vboc;
 		
-		for(int i = 0; i < 100; i++) {
-			//Cubo3D cubo = new Cubo3D(rnd.nextFloat()*2-1,rnd.nextFloat()*2-1, rnd.nextFloat()*2-1, rnd.nextFloat()*0.005f+0.0001f);
-			//cubo.model = x35;
-			Cubo3D cubo = new Cubo3D(rnd.nextFloat()*2-1,rnd.nextFloat()*2-1, rnd.nextFloat()*2-1, rnd.nextFloat()*0.1f+0.05f);
-			cubo.model = vboc;
-			cubo.vx = rnd.nextFloat()*0.4f-0.2f;
-			cubo.vy = rnd.nextFloat()*0.4f-0.2f;
-			cubo.vz = rnd.nextFloat()*0.4f-0.2f;
-			cubo.rotvel = rnd.nextFloat()*9;
-			listaObjetos.add(cubo);
-		}
+//		for(int i = 0; i < 100; i++) {
+//			//Cubo3D cubo = new Cubo3D(rnd.nextFloat()*2-1,rnd.nextFloat()*2-1, rnd.nextFloat()*2-1, rnd.nextFloat()*0.005f+0.0001f);
+//			//cubo.model = x35;
+//			Cubo3D cubo = new Cubo3D(rnd.nextFloat()*2-1,rnd.nextFloat()*2-1, rnd.nextFloat()*2-1, rnd.nextFloat()*0.1f+0.05f);
+//			cubo.model = vboc;
+//			cubo.vx = rnd.nextFloat()*0.4f-0.2f;
+//			cubo.vy = rnd.nextFloat()*0.4f-0.2f;
+//			cubo.vz = rnd.nextFloat()*0.4f-0.2f;
+//			cubo.rotvel = rnd.nextFloat()*9;
+//			listaObjetos.add(cubo);
+//		}
 		
 		//BufferedImage gatorgba = new BufferedImage(imggato.getWidth(), imggato.getHeight(), BufferedImage.TYPE_INT_ARGB);
 		//gatorgba.getGraphics().drawImage(imggato, 0, 0, null);
@@ -302,8 +311,11 @@ public class Main3D {
 		}
 	}
 
+	long tirotimer = 0;
 	private void gameUpdate(long diftime) {
 		float vel = 5.0f;
+		
+		tirotimer+=diftime;
 		
 		//angluz+=(Math.PI/4)*diftime/1000.0f;
 		angluz = 0;
@@ -385,10 +397,52 @@ public class Main3D {
 		//view.mul(view, cameraMatrix, view);
 		//view.translate(new Vector3f(-cameraPos.x,-cameraPos.y,-cameraPos.z));
 		
+		m29.raio = 0.01f;
+		m29.Front = cameraVectorFront;
+		m29.UP = cameraVectorUP;
+		m29.Right = cameraVectorRight;
+		m29.x = cameraPos.x - cameraVectorFront.x*2;
+		m29.y = cameraPos.y - cameraVectorFront.y*2;
+		m29.z = cameraPos.z - cameraVectorFront.z*2;
+		
+		//System.out.println(""+cameraVectorFront);
+		//System.out.println(""+m29.x+" "+m29.y+" "+m29.z);
+		//m29.y = -0.5f;		
+		
+		
+		if(FIRE&&tirotimer>=100) {
+			Projetil pj = new Projetil(m29.x+cameraVectorRight.x*0.5f+cameraVectorUP.x*0.2f, 
+									   m29.y+cameraVectorRight.y*0.5f+cameraVectorUP.y*0.2f, 
+									   m29.z+cameraVectorRight.z*0.5f+cameraVectorUP.z*0.2f);
+			pj.vx = -cameraVectorFront.x*7;
+			pj.vy = -cameraVectorFront.y*7;
+			pj.vz = -cameraVectorFront.z*7;
+			pj.raio = 0.1f;
+			pj.model = vboc;
+			
+			listaObjetos.add(pj);
+			
+			pj = new Projetil(m29.x-cameraVectorRight.x*0.5f+cameraVectorUP.x*0.2f, 
+					   		  m29.y-cameraVectorRight.y*0.5f+cameraVectorUP.y*0.2f, 
+					          m29.z-cameraVectorRight.z*0.5f+cameraVectorUP.z*0.2f);
+			pj.vx = -cameraVectorFront.x*7;
+			pj.vy = -cameraVectorFront.y*7;
+			pj.vz = -cameraVectorFront.z*7;
+			pj.raio = 0.1f;
+			pj.model = vboc;
+			
+			listaObjetos.add(pj);
+			tirotimer = 0;
+		}
 		
 		
 		for(int i = 0; i < listaObjetos.size();i++) {
-			listaObjetos.get(i).SimulaSe(diftime);
+			Object3D obj = listaObjetos.get(i);
+			obj.SimulaSe(diftime);
+			if(obj.vivo==false) {
+				listaObjetos.remove(i);
+				i--;
+			}
 		}
 	}
 
@@ -439,13 +493,7 @@ public class Main3D {
 		glUniformMatrix4fv(viewlocation, false, matrixBuffer);
 		
 		mapa.DesenhaSe(shader);
-		umcubo.DesenhaSe(shader);
-		
-//			for(int i = 0; i < listaObjetos.size();i++) {
-//				listaObjetos.get(i).DesenhaSe(shader);
-//			}
-		
-		
+		umcubo.DesenhaSe(shader);		
 		
 		
 //		viewlocation = glGetUniformLocation(shader.programID, "view");
@@ -455,21 +503,14 @@ public class Main3D {
 //		matrixBuffer.flip();
 //		glUniformMatrix4fv(viewlocation, false, matrixBuffer);
 		
-		m29.raio = 0.01f;
-		m29.Front = cameraVectorFront;
-		m29.UP = cameraVectorUP;
-		m29.Right = cameraVectorRight;
-		m29.x = cameraPos.x - cameraVectorFront.x*2;
-		m29.y = cameraPos.y - cameraVectorFront.y*2;
-		m29.z = cameraPos.z - cameraVectorFront.z*2;
-		
-		System.out.println(""+cameraVectorFront);
-		System.out.println(""+m29.x+" "+m29.y+" "+m29.z);
-		//m29.y = -0.5f;
+
 		
 		glBindTexture(GL_TEXTURE_2D, txtmig);
 		m29.DesenhaSe(shader);
 		
+		for(int i = 0; i < listaObjetos.size();i++) {
+			listaObjetos.get(i).DesenhaSe(shader);
+		}
 		
 		
 		shader.stop();
