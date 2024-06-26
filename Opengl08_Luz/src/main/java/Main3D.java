@@ -8,8 +8,11 @@ import org.lwjgl.util.vector.Matrix4f;
 import org.lwjgl.util.vector.Vector3f;
 import org.lwjgl.util.vector.Vector4f;
 
+import Model.VboBilboard;
 import Model.VboCube;
+import dados.Constantes;
 import obj.Cubo3D;
+import obj.Mapa3D;
 import obj.ObjHTGsrtm;
 import obj.ObjModel;
 import obj.Object3D;
@@ -48,11 +51,12 @@ public class Main3D {
 	public Random rnd = new Random();
 	
 	VboCube vboc;
+	VboBilboard vboBilbord;
 	StaticShader shader;
 	ArrayList<Object3D> listaObjetos = new ArrayList<>();
 	
 	
-	Vector4f cameraPos = new  Vector4f(0.0f,0.0f, 0.0f,1.0f);
+	Vector4f cameraPos = new  Vector4f(0.0f,10.0f, 0.0f,1.0f);
 	Vector4f cameraVectorFront = new Vector4f(0.0f, 0.0f, -1.0f,1.0f);
 	Vector4f cameraVectorUP = new Vector4f(0.0f, 1.0f, 0.0f,1.0f);
 	Vector4f cameraVectorRight = new Vector4f(1.0f, 0.0f, 0.0f,1.0f);
@@ -74,11 +78,9 @@ public class Main3D {
 	
 	Matrix4f cameraMatrix = new Matrix4f();
 	
-	int tmult;
-	int tgato;
-	int txtmig;
+
 	FloatBuffer matrixBuffer = MemoryUtil.memAllocFloat(16);
-	Cubo3D mapa;
+	
 	Cubo3D umcubo;
 	Player m29;
 	
@@ -223,6 +225,8 @@ public class Main3D {
 		
 		vboc = new VboCube();
 		vboc.load();
+		vboBilbord = new VboBilboard();
+		vboBilbord.load();
 		shader = new StaticShader();
 		
 		//Cubo3D cubo = new Cubo3D(0.0f, 0.0f, -1.0f, 0.2f);
@@ -243,8 +247,8 @@ public class Main3D {
 		ObjHTGsrtm model = new ObjHTGsrtm();
 		model.load();
 		
-		mapa = new Cubo3D(-10.0f, 0.0f, -10.0f, 10);
-		mapa.model = model;
+		Constantes.mapa = new Mapa3D(-10.0f, 0.0f, -10.0f, 10);
+		Constantes.mapa.model = model;
 		
 		umcubo = new Cubo3D(0.0f, 0.0f, 0.8f, 0.1f);
 		umcubo.model = vboc;
@@ -265,17 +269,26 @@ public class Main3D {
 		//gatorgba.getGraphics().drawImage(imggato, 0, 0, null);
 		
 		BufferedImage imggato = TextureLoader.loadImage("texturaGato.jpeg");
-		tgato = TextureLoader.loadTexture(imggato);
-		System.out.println("tgato "+tgato);
+		Constantes.tgato = TextureLoader.loadTexture(imggato);
+		System.out.println("tgato "+Constantes.tgato);
 		
 		BufferedImage imgmulttexture = TextureLoader.loadImage("multtexture.png");
-		tmult = TextureLoader.loadTexture(imgmulttexture);
-		System.out.println("tmult "+tmult);
+		Constantes.tmult = TextureLoader.loadTexture(imgmulttexture);
+		System.out.println("tmult "+Constantes.tmult);
 		
 		
 		BufferedImage texturamig = TextureLoader.loadImage("TexturaMig01.png");
-		txtmig = TextureLoader.loadTexture(texturamig);
-		System.out.println("tmult "+tmult);
+		Constantes.txtmig = TextureLoader.loadTexture(texturamig);
+		System.out.println("tmult "+Constantes.tmult);
+		
+		BufferedImage imgtexttiro = TextureLoader.loadImage("texturaTiro.png");
+		Constantes.texturaTiro = TextureLoader.loadTexture(imgtexttiro);
+		System.out.println("texturaTiro "+Constantes.texturaTiro);
+		
+		BufferedImage imgtextexp = TextureLoader.loadImage("texturaExplosao.png");
+		Constantes.texturaExplosao = TextureLoader.loadTexture(imgtextexp);
+		System.out.println("texturaExplosao "+Constantes.texturaExplosao);
+		
 		
 
 		int frame = 0;
@@ -405,31 +418,36 @@ public class Main3D {
 		m29.y = cameraPos.y - cameraVectorFront.y*2;
 		m29.z = cameraPos.z - cameraVectorFront.z*2;
 		
+		Constantes.mapa.testaColisao(m29.x, m29.y, m29.z, 0.1f);
+		
 		//System.out.println(""+cameraVectorFront);
 		//System.out.println(""+m29.x+" "+m29.y+" "+m29.z);
 		//m29.y = -0.5f;		
 		
 		
 		if(FIRE&&tirotimer>=100) {
+			float velocidade_projetil = 14;
 			Projetil pj = new Projetil(m29.x+cameraVectorRight.x*0.5f+cameraVectorUP.x*0.2f, 
 									   m29.y+cameraVectorRight.y*0.5f+cameraVectorUP.y*0.2f, 
 									   m29.z+cameraVectorRight.z*0.5f+cameraVectorUP.z*0.2f);
-			pj.vx = -cameraVectorFront.x*7;
-			pj.vy = -cameraVectorFront.y*7;
-			pj.vz = -cameraVectorFront.z*7;
-			pj.raio = 0.1f;
-			pj.model = vboc;
+			pj.vx = -cameraVectorFront.x*velocidade_projetil;
+			pj.vy = -cameraVectorFront.y*velocidade_projetil;
+			pj.vz = -cameraVectorFront.z*velocidade_projetil;
+			pj.raio = 0.2f;
+			pj.model = vboBilbord;
+			pj.setRotation(cameraVectorFront, cameraVectorUP, cameraVectorRight);
 			
 			listaObjetos.add(pj);
 			
 			pj = new Projetil(m29.x-cameraVectorRight.x*0.5f+cameraVectorUP.x*0.2f, 
 					   		  m29.y-cameraVectorRight.y*0.5f+cameraVectorUP.y*0.2f, 
 					          m29.z-cameraVectorRight.z*0.5f+cameraVectorUP.z*0.2f);
-			pj.vx = -cameraVectorFront.x*7;
-			pj.vy = -cameraVectorFront.y*7;
-			pj.vz = -cameraVectorFront.z*7;
-			pj.raio = 0.1f;
-			pj.model = vboc;
+			pj.vx = -cameraVectorFront.x*velocidade_projetil;
+			pj.vy = -cameraVectorFront.y*velocidade_projetil;
+			pj.vz = -cameraVectorFront.z*velocidade_projetil;
+			pj.raio = 0.2f;
+			pj.model = vboBilbord;
+			pj.setRotation(cameraVectorFront, cameraVectorUP, cameraVectorRight);
 			
 			listaObjetos.add(pj);
 			tirotimer = 0;
@@ -475,7 +493,7 @@ public class Main3D {
 		
 		glActiveTexture(GL_TEXTURE0);
 		//glBindTexture(GL_TEXTURE_2D, tgato);
-		glBindTexture(GL_TEXTURE_2D, tmult);
+		glBindTexture(GL_TEXTURE_2D, Constantes.tmult);
 		
 		
 		int loctexture = glGetUniformLocation(shader.programID, "tex");
@@ -492,7 +510,7 @@ public class Main3D {
 		matrixBuffer.flip();
 		glUniformMatrix4fv(viewlocation, false, matrixBuffer);
 		
-		mapa.DesenhaSe(shader);
+		Constantes.mapa.DesenhaSe(shader);
 		umcubo.DesenhaSe(shader);		
 		
 		
@@ -505,9 +523,11 @@ public class Main3D {
 		
 
 		
-		glBindTexture(GL_TEXTURE_2D, txtmig);
+		glBindTexture(GL_TEXTURE_2D, Constantes.txtmig);
 		m29.DesenhaSe(shader);
 		
+		//glBlendFunc(GL_ONE, GL_ONE_MINUS_SRC_ALPHA);
+		glBindTexture(GL_TEXTURE_2D, Constantes.texturaTiro);
 		for(int i = 0; i < listaObjetos.size();i++) {
 			listaObjetos.get(i).DesenhaSe(shader);
 		}

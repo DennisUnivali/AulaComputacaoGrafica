@@ -42,13 +42,15 @@ public class ObjHTGsrtm extends Model{
 	int normal_size = 3;
 	int texture_size = 2;
 	
+	public int data[][];
+	public int wh;
 
 	@Override
 	public void load() {
 		File f = new File("S28W049.hgt");
 		int l = (int)f.length();
 		System.out.println("l "+l);
-		int wh = (int)Math.sqrt(l/2);
+		wh = (int)Math.sqrt(l/2);
 		
 		System.out.println("wh "+wh);
 		
@@ -56,7 +58,7 @@ public class ObjHTGsrtm extends Model{
 			BufferedInputStream bin = new BufferedInputStream(new FileInputStream(f),1024000);
 			DataInputStream din = new DataInputStream(bin);
 			
-			int data[][] = new int[wh][wh];
+			data = new int[wh][wh];
 			for(int j = 0 ; j < wh;j++) {
 				for(int i = 0 ; i < wh;i++) {
 					data[j][i] = din.readShort();
